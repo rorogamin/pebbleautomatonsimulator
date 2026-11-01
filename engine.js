@@ -2557,7 +2557,7 @@ export const PRESETS = [
         desc: "8-rule champion. 63 steps of intricate space-time shuttling."
     },
     {
-        name: "peBBle(9) = 63,577 Steps (Collatz Champion)",
+        name: "peBBle(9) = 63,577 Steps (Proven Optimal)",
         n: 9,
         code: "00_02_01_40_14_12_00_52_81",
         steps: 63577,
