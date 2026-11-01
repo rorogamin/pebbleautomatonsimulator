@@ -217,10 +217,32 @@
                             <p class="subnote">By default, all n pebbles start in a single cell at x=0. You can specify a custom distribution (e.g. <code>1 0 10 1</code> for the 12-pebble cryptid):</p>
                             <div class="input-with-button">
                                 <input type="text" id="input-custom-tape" class="text-input code-font" placeholder="Standard: single cell of n at x=0">
-                                <button id="btn-apply-tape" class="btn btn-secondary btn-sm">Apply Tape</button>
+                                <button id="btn-apply-tape" class="btn btn-secondary btn-sm">Apply Text</button>
                             </div>
                             <div style="margin-top:6px; display:flex; gap:6px;">
                                 <button id="btn-preset-4x9-tape" class="btn btn-xs btn-secondary">⚡ Load 4×9 Spaced Tape (9 at 0, 45, 90, 135)</button>
+                            </div>
+
+                            <div class="visual-tape-builder">
+                                <div class="tape-ribbon-toolbar">
+                                    <div class="tape-ribbon-summary">
+                                        <span class="ribbon-label">Interactive Ribbon:</span>
+                                        <span id="ribbon-pebble-count" class="badge">Sum: 6 pebbles</span>
+                                    </div>
+                                    <div class="tape-ribbon-actions">
+                                        <button id="btn-ribbon-shift-left" class="btn btn-xs btn-action-tool" title="Scroll view left">◀</button>
+                                        <button id="btn-ribbon-center" class="btn btn-xs btn-action-tool" title="Center on x=0">Center</button>
+                                        <button id="btn-ribbon-shift-right" class="btn btn-xs btn-action-tool" title="Scroll view right">▶</button>
+                                        <button id="btn-ribbon-clear" class="btn btn-xs btn-action-tool" title="Clear all pebbles">Clear</button>
+                                        <button id="btn-ribbon-reset-n" class="btn btn-xs btn-action-tool" title="Reset to standard (all n at x=0)">Reset (n at 0)</button>
+                                    </div>
+                                </div>
+                                <div class="tape-ribbon-container" id="tape-ribbon-container">
+                                    <!-- Populated dynamically by app.js -->
+                                </div>
+                                <div class="tape-ribbon-hint">
+                                    Left-click to add pebble · Right-click or Shift-click to remove · Drag/click instantly updates simulation
+                                </div>
                             </div>
                         </div>
                     </div>

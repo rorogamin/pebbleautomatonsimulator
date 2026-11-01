@@ -425,7 +425,7 @@ function resizeCanvas() {
     ctx.scale(dpr, dpr);
 
     renderDiagram();
-
+    if (typeof renderTapeRibbon === 'function') renderTapeRibbon();
 }
 
 
@@ -443,7 +443,7 @@ function centerCamera() {
     view.panY = 30;
 
     renderDiagram();
-
+    if (typeof renderTapeRibbon === 'function') renderTapeRibbon();
 }
 
 
@@ -958,7 +958,7 @@ function stepSimulation() {
     updateUI();
 
     renderDiagram();
-
+    if (typeof renderTapeRibbon === 'function') renderTapeRibbon();
 }
 
 
@@ -979,7 +979,7 @@ function resetSimulation() {
     updateUI();
 
     renderDiagram();
-
+    if (typeof renderTapeRibbon === 'function') renderTapeRibbon();
 }
 
 
@@ -1530,7 +1530,7 @@ renderModeSelect.addEventListener("change", (e) => {
     currentRenderMode = e.target.value;
 
     renderDiagram();
-
+    if (typeof renderTapeRibbon === 'function') renderTapeRibbon();
 });
 
 
@@ -1816,7 +1816,7 @@ btnFlipRule.addEventListener("click", () => {
     rebuildRuleTable();
 
     resetSimulation();
-
+    renderTapeRibbon();
 });
 
 
@@ -1842,7 +1842,7 @@ btnRandomRule.addEventListener("click", () => {
     rebuildRuleTable();
 
     resetSimulation();
-
+    renderTapeRibbon();
 });
 
 
@@ -1856,7 +1856,7 @@ btnResetRule.addEventListener("click", () => {
     rebuildRuleTable();
 
     resetSimulation();
-
+    renderTapeRibbon();
 });
 
 
@@ -2130,7 +2130,7 @@ btnApplyTape.addEventListener("click", () => {
     });
 
     resetSimulation();
-
+    renderTapeRibbon();
 });
 
 
@@ -3309,3 +3309,145 @@ if (btnLeapGoogol) {
         renderDiagram();
     });
 }
+
+// ==========================================
+// Interactive Visual Tape Ribbon Builder
+// ==========================================
+let ribbonCenterOffset = 0;
+const ribbonContainer = document.getElementById("tape-ribbon-container");
+const ribbonPebbleCount = document.getElementById("ribbon-pebble-count");
+const btnRibbonShiftLeft = document.getElementById("btn-ribbon-shift-left");
+const btnRibbonShiftRight = document.getElementById("btn-ribbon-shift-right");
+const btnRibbonCenter = document.getElementById("btn-ribbon-center");
+const btnRibbonClear = document.getElementById("btn-ribbon-clear");
+const btnRibbonResetN = document.getElementById("btn-ribbon-reset-n");
+
+function getCustomTapeMap() {
+    const map = new Map();
+    if (customTape && customTape.length > 0) {
+        for (const [x, v] of customTape) {
+            if (v > 0) map.set(x, v);
+        }
+    } else {
+        map.set(0, currentRule ? currentRule.n : 6);
+    }
+    return map;
+}
+
+function syncCustomTapeFromMap(map) {
+    customTape = [];
+    let sum = 0;
+    const sortedKeys = Array.from(map.keys()).sort((a, b) => a - b);
+    for (const k of sortedKeys) {
+        const v = map.get(k);
+        if (v > 0) {
+            customTape.push([k, v]);
+            sum += v;
+        }
+    }
+    if (customTape.length === 0) customTape = null;
+
+    if (inputCustomTape) {
+        if (!customTape) {
+            inputCustomTape.value = "";
+        } else {
+            inputCustomTape.value = customTape.map(([x, v]) => `${x}:${v}`).join(" ");
+        }
+    }
+    if (ribbonPebbleCount) {
+        ribbonPebbleCount.textContent = `Sum: ${sum} pebbles`;
+    }
+    resetSimulation();
+    renderTapeRibbon();
+}
+
+function renderTapeRibbon() {
+    if (!ribbonContainer) return;
+    const map = getCustomTapeMap();
+    let totalPebbles = 0;
+    for (const v of map.values()) totalPebbles += v;
+
+    if (ribbonPebbleCount) {
+        ribbonPebbleCount.textContent = `Sum: ${totalPebbles} pebbles`;
+    }
+
+    ribbonContainer.innerHTML = "";
+    const rangeRadius = 7;
+    for (let x = ribbonCenterOffset - rangeRadius; x <= ribbonCenterOffset + rangeRadius; x++) {
+        const val = map.get(x) || 0;
+        const cellBtn = document.createElement("div");
+        cellBtn.className = `tape-cell-btn ${val > 0 ? "has-pebbles" : ""} ${x === 0 ? "is-origin" : ""}`;
+        cellBtn.title = `Cell x = ${x}. Left-click to add, Right-click to subtract.`;
+
+        const xLabel = document.createElement("span");
+        xLabel.className = "tape-cell-x";
+        xLabel.textContent = x === 0 ? "x=0" : (x > 0 ? `+${x}` : `${x}`);
+
+        const vLabel = document.createElement("span");
+        vLabel.className = "tape-cell-val";
+        vLabel.textContent = val > 0 ? val : "·";
+
+        cellBtn.appendChild(xLabel);
+        cellBtn.appendChild(vLabel);
+
+        cellBtn.addEventListener("click", (e) => {
+            const current = map.get(x) || 0;
+            if (e.shiftKey) {
+                if (current > 0) map.set(x, current - 1);
+            } else {
+                map.set(x, current + 1);
+            }
+            syncCustomTapeFromMap(map);
+        });
+
+        cellBtn.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            const current = map.get(x) || 0;
+            if (current > 0) {
+                map.set(x, current - 1);
+                syncCustomTapeFromMap(map);
+            }
+        });
+
+        ribbonContainer.appendChild(cellBtn);
+    }
+}
+
+if (btnRibbonShiftLeft) {
+    btnRibbonShiftLeft.addEventListener("click", () => {
+        ribbonCenterOffset -= 5;
+        renderTapeRibbon();
+    });
+}
+
+if (btnRibbonShiftRight) {
+    btnRibbonShiftRight.addEventListener("click", () => {
+        ribbonCenterOffset += 5;
+        renderTapeRibbon();
+    });
+}
+
+if (btnRibbonCenter) {
+    btnRibbonCenter.addEventListener("click", () => {
+        ribbonCenterOffset = 0;
+        renderTapeRibbon();
+    });
+}
+
+if (btnRibbonClear) {
+    btnRibbonClear.addEventListener("click", () => {
+        const map = new Map();
+        syncCustomTapeFromMap(map);
+    });
+}
+
+if (btnRibbonResetN) {
+    btnRibbonResetN.addEventListener("click", () => {
+        customTape = null;
+        if (inputCustomTape) inputCustomTape.value = "";
+        resetSimulation();
+        renderTapeRibbon();
+    });
+}
+
+renderTapeRibbon();

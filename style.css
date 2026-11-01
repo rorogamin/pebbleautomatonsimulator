@@ -1428,3 +1428,107 @@ canvas#spacetime-canvas {
     0% { opacity: 0.85; }
     100% { opacity: 1; border-color: #fb7185; }
 }
+
+/* Visual Tape Ribbon Builder */
+.visual-tape-builder {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tape-ribbon-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tape-ribbon-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.ribbon-label {
+    color: var(--text-secondary);
+}
+
+.tape-ribbon-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.tape-ribbon-container {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 6px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.tape-cell-btn {
+    min-width: 36px;
+    height: 48px;
+    background: var(--bg-card-sub);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 2px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s ease;
+}
+
+.tape-cell-btn:hover {
+    background: var(--bg-hover);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.tape-cell-btn.has-pebbles {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: var(--accent-cyan);
+}
+
+.tape-cell-btn.is-origin {
+    border-bottom: 2px solid var(--accent-cyan);
+}
+
+.tape-cell-x {
+    font-family: var(--font-code);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.tape-cell-btn.is-origin .tape-cell-x {
+    color: var(--accent-cyan);
+    font-weight: 700;
+}
+
+.tape-cell-val {
+    font-family: var(--font-code);
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+}
+
+.tape-cell-btn.has-pebbles .tape-cell-val {
+    color: #38bdf8;
+}
+
+.tape-ribbon-hint {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-style: italic;
+}

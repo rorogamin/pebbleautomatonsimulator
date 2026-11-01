@@ -54,6 +54,17 @@ verify_*
 apply_*
 task-*
 
+# Theorem Prover artifacts (Lean 4 and Rocq / Coq)
+.lia.cache
+*.vo
+*.vok
+*.vos
+*.glob
+*.aux
+.*.aux
+*.olean
+.lake/
+
 # Intermediate text files (curated datasets are preserved in JSON)
 *.txt
 
