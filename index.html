@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pebble Automaton Lab & Ultra-Fast Finder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand">
+            <span class="logo-icon">⚪⚫</span>
+            <div>
+                <h1>Pebble Automaton Lab</h1>
+                <span class="subtext">Interactive Simulator &bull; Space-Time Diagrammer &bull; Ultra-Fast BB Finder</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div id="engine-status" class="status-pill status-connecting">
+                <span class="dot"></span>
+                <span class="status-text">Detecting Engine...</span>
+            </div>
+            <button id="btn-wiki-info" class="btn btn-secondary btn-sm" title="Learn about Pebble Automata">📖 Wiki Info</button>
+            <a href="https://wiki.bbchallenge.org/wiki/Pebble_Automaton" target="_blank" class="btn btn-secondary btn-sm">🔗 BB Wiki</a>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- Left Panel: Space-Time Diagrammer -->
+        <section class="diagram-section">
+            <div class="section-toolbar">
+                <div class="toolbar-group">
+                    <label class="control-label">Preset:</label>
+                    <select id="preset-select" class="select-input">
+                        <option value="">-- Choose Preset Machine --</option>
+                    </select>
+                    <button id="btn-load-4x9" class="btn btn-primary btn-sm" style="font-weight:700; background:linear-gradient(135deg, #ff0077, #7928ca); border:none; padding:4px 10px;" title="Load 00_02_01_40_14_12_00_52_81 with four 9-pebble wave packets spaced 45 cells apart">🚀 4×9 Super-Automaton</button>
+                </div>
+
+                <div class="toolbar-group">
+                    <label class="control-label">Palette:</label>
+                    <select id="palette-select" class="select-input">
+                        <option value="cyberpunk">Cyberpunk Neon</option>
+                        <option value="thermal">Thermal Heatmap</option>
+                        <option value="classic">BB Classic</option>
+                        <option value="terminal">Wiki Terminal Dots</option>
+                    </select>
+                </div>
+
+                <div class="toolbar-group">
+                    <label class="control-label">View:</label>
+                    <select id="render-mode" class="select-input">
+                        <option value="blocks">Solid Blocks</option>
+                        <option value="numbers">Blocks + Numbers</option>
+                        <option value="wiki">Wiki ASCII / Dots</option>
+                    </select>
+                </div>
+
+                <div class="toolbar-group actions">
+                    <button id="btn-zoom-in" class="btn btn-icon" title="Zoom In">+</button>
+                    <button id="btn-zoom-out" class="btn btn-icon" title="Zoom Out">&minus;</button>
+                    <button id="btn-fit" class="btn btn-icon" title="Reset View & Fit (Auto-Fit 1M Steps)">⛶ Fit</button>
+                    <button id="btn-aspect" class="btn btn-toggle active" title="Toggle Square (1:1) vs Auto-Fit Anamorphic (Stretches view to fit million-step tape)">Auto-Fit Aspect</button>
+                    <div class="aspect-width-control" style="display:inline-flex; align-items:center; gap:5px; margin-left:3px; background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:4px; font-size:0.75rem; border:1px solid rgba(255,255,255,0.12);" title="Set the horizontal width of the auto-fit diagram (e.g. 20% for a slim/thin diagram, 100% for full width)">
+                        <label style="cursor:pointer; font-weight:600; color:var(--text-secondary); user-select:none;">X-Width:</label>
+                        <input type="range" id="aspect-width-slider" min="5" max="100" value="100" step="5" style="width:65px; height:6px; accent-color:var(--accent-cyan); cursor:pointer;" title="Adjust X aspect ratio width (5% to 100%)">
+                        <span id="aspect-width-label" style="font-family:var(--font-code); font-weight:700; min-width:34px; color:var(--accent-cyan);">100%</span>
+                    </div>
+                    <button id="btn-follow" class="btn btn-toggle active" title="Auto-center on active tape">Center</button>
+                    <button id="btn-export-png" class="btn btn-icon" title="Export PNG Image">📷</button>
+                    <button id="btn-export-ascii" class="btn btn-icon" title="Copy Wiki ASCII Art">📋</button>
+                </div>
+            </div>
+
+            <div class="canvas-container" id="canvas-container">
+                <canvas id="spacetime-canvas"></canvas>
+                <div id="hover-tooltip" class="hover-tooltip hidden"></div>
+            </div>
+
+            <!-- Playback & Stats Bar -->
+            <div class="playback-bar">
+                <div class="playback-controls">
+                    <button id="btn-reset" class="btn btn-icon" title="Reset Simulation (R)">⏮</button>
+                    <button id="btn-prev" class="btn btn-icon" title="Step Back (Left Arrow)">◀</button>
+                    <button id="btn-play" class="btn btn-primary" title="Play / Pause (Space)">▶ Play</button>
+                    <button id="btn-next" class="btn btn-icon" title="Step Forward (Right Arrow)">▶</button>
+                    <div class="run-end-group">
+                        <button id="btn-run-all" class="btn btn-secondary" title="Simulate until Halt">⚡ Run to End</button>
+                        <input type="number" id="sim-max-steps" value="10000" min="100" max="10000000" step="5000" class="num-input sim-steps-input" title="Max Step Limit for Run to End (e.g. 100,000 for peBBle(9))">
+                    </div>
+
+                    <div class="cosmic-leap-group" style="display:inline-flex; align-items:center; gap:4px; margin-left:6px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:5px; border:1px solid rgba(255,255,255,0.12);">
+                        <span style="font-size:0.75rem; font-weight:700; color:var(--accent-cyan);">🚀 Cosmic Leap:</span>
+                        <button id="btn-leap-googol" class="btn btn-xs" style="background:rgba(0,240,255,0.15); border:1px solid var(--accent-cyan); color:var(--accent-cyan); font-weight:700;" title="Leap instantaneously to 10^100 steps (Googol)">10^100</button>
+                    </div>
+                </div>
+
+                <div class="scrubber-group">
+                    <span id="step-label" class="step-label">Step: 0</span>
+                    <input type="range" id="step-scrubber" min="0" max="0" value="0" class="slider">
+                </div>
+
+                <div class="speed-group" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <label>Speed:</label>
+                    <input type="range" id="speed-slider" min="0" max="19" value="3" class="slider" title="Simulation Speed (up to Cosmic Googol 10^100 steps/s)">
+                    <span id="speed-label" style="font-weight:700; min-width:95px; font-family:var(--font-code); font-size:0.75rem;">100 steps/s</span>
+                    <div class="speed-presets" style="display:flex; gap:3px; margin-left:2px; flex-wrap:wrap;">
+                        <button class="btn btn-xs btn-speed-preset" data-speed="100">100/s</button>
+                        <button class="btn btn-xs btn-speed-preset btn-turbo" data-speed="1000000" style="background:rgba(255,0,119,0.22); color:var(--accent-pink); border:1px solid var(--accent-pink); font-weight:700;" title="1,000,000 steps/s Turbo">⚡ 1M/s</button>
+                        <button class="btn btn-xs btn-speed-preset btn-ultra" data-speed="500000000" style="background:rgba(255,187,0,0.22); color:#ffd700; border:1px solid #ffd700; font-weight:800;" title="500,000,000 steps/s Hyper Speed">🚀 500M/s</button>
+                        <button class="btn btn-xs btn-speed-preset btn-warp" data-speed="1e12" style="background:rgba(0,229,255,0.2); color:var(--accent-cyan); border:1px solid var(--accent-cyan); font-weight:800;" title="1 Trillion (10^12) steps/s">🌌 1T/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e15" style="background:rgba(168,85,247,0.28); color:#e9d5ff; border:1px solid #c084fc; font-weight:800;" title="1 Quadrillion (10^15) steps/s">🪐 1Qa/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e18" style="background:rgba(236,72,153,0.28); color:#fbcfe8; border:1px solid #f472b6; font-weight:800;" title="1 Quintillion (10^18) steps/s">☀️ 1Qi/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e21" style="background:rgba(59,130,246,0.28); color:#bfdbfe; border:1px solid #60a5fa; font-weight:800;" title="1 Sextillion (10^21) steps/s">🕳️ 1Sx/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e30" style="background:linear-gradient(135deg, rgba(255,0,128,0.4), rgba(121,40,202,0.45), rgba(0,240,255,0.4)); color:#ffffff; border:1px solid #00f0ff; font-weight:900;" title="1 Nonillion (10^30) steps/s Omega Parabolic + Light-Cone Drive">♾️ 1No/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e100" style="background:rgba(236,72,153,0.3); color:#fbcfe8; border:1px solid #f472b6; font-weight:800;" title="1 Googol (10^100) steps/s">🌌 10^100/s</button>
+                    </div>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle-control" title="When unchecked, the simulation continues running even after a decider identifies a cycler or bouncer.">
+                        <input type="checkbox" id="auto-stop-decider">
+                        <span>Auto-stop Decider</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Real-Time Metrics Strip -->
+            <div class="metrics-strip">
+                <div class="metric"><span class="m-label">Status:</span> <span id="stat-status" class="m-val status-badge running">Ready</span></div>
+                <div class="metric"><span class="m-label">Generations:</span> <span id="stat-steps" class="m-val">0</span></div>
+                <div class="metric"><span class="m-label">Active Cells:</span> <span id="stat-cells" class="m-val">1</span></div>
+                <div class="metric"><span class="m-label">Tape Width:</span> <span id="stat-width" class="m-val">1</span></div>
+                <div class="metric"><span class="m-label">Tape Range:</span> <span id="stat-range" class="m-val">[0, 0]</span></div>
+                <div class="metric"><span class="m-label">Pebble Sum:</span> <span id="stat-pebbles" class="m-val">6</span></div>
+                <div class="metric" title="Total Simulator + History RAM Footprint (Zero-Allocation CompactTape)"><span class="m-label">RAM:</span> <span id="stat-memory" class="m-val" style="color:var(--accent-cyan);">0.01 MB</span></div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Rule Editor & Fast Finder Tabs -->
+        <section class="control-section">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="tab-editor">✏️ Rule Editor</button>
+                <button class="tab-btn" data-tab="tab-finder">🚀 Ultra-Fast Finder</button>
+                <button class="tab-btn" data-tab="tab-wiki">📚 Wiki & Cryptids</button>
+                <button class="tab-btn" data-tab="tab-holdouts">🔬 Holdouts (960)</button>
+            </div>
+
+            <div class="tabs-content">
+                <!-- TAB 1: Rule Editor -->
+                <div id="tab-editor" class="tab-pane active">
+                    <div class="n-config-card">
+                        <div class="field-row">
+                            <label for="input-n"><strong>Total Pebbles (n):</strong></label>
+                            <div class="n-stepper">
+                                <button id="btn-n-dec" class="btn btn-sm btn-icon">-</button>
+                                <input type="number" id="input-n" min="1" max="128" value="6" class="num-input">
+                                <button id="btn-n-inc" class="btn btn-sm btn-icon">+</button>
+                            </div>
+                            <span class="subnote">Set n to whatever you want!</span>
+                        </div>
+
+                        <div class="quick-n-pills">
+                            <span>Quick n:</span>
+                            <button class="pill-btn" data-n="4">n=4</button>
+                            <button class="pill-btn" data-n="5">n=5</button>
+                            <button class="pill-btn active" data-n="6">n=6</button>
+                            <button class="pill-btn" data-n="7">n=7</button>
+                            <button class="pill-btn" data-n="8">n=8</button>
+                            <button class="pill-btn" data-n="9">n=9</button>
+                            <button class="pill-btn" data-n="12">n=12</button>
+                            <button class="pill-btn" data-n="86">n=86</button>
+                        </div>
+                    </div>
+
+                    <div class="rule-code-card">
+                        <div class="code-header-row">
+                            <label class="control-label"><strong>Rule Code</strong> (Short Hex, Sparse <code>k:L,R</code>, or Wiki format):</label>
+                            <div class="format-toggles">
+                                <button type="button" class="btn-fmt active" id="btn-fmt-auto" title="Smart format (Sparse for large n)">Auto</button>
+                                <button type="button" class="btn-fmt" id="btn-fmt-sparse" title="Sparse format (no zero clutter)">Sparse</button>
+                                <button type="button" class="btn-fmt" id="btn-fmt-dense" title="Dense format (all rules)">Dense</button>
+                            </div>
+                        </div>
+                        <div class="input-with-button">
+                            <input type="text" id="input-rule-code" class="text-input code-font" value="00_11_03_21_40_15" spellcheck="false" placeholder="Enter rule code or sparse rules (e.g. 84:24,45 86:1,84)...">
+                            <button id="btn-apply-code" class="btn btn-primary btn-sm">Apply</button>
+                        </div>
+                        <div class="code-actions">
+                            <button id="btn-copy-code" class="btn btn-secondary btn-xs">📋 Copy Code</button>
+                            <button id="btn-copy-wiki" class="btn btn-secondary btn-xs" title="Copy Wiki Rules format">📋 Copy Wiki</button>
+                            <button id="btn-flip-rule" class="btn btn-secondary btn-xs" title="Swap Left and Right rules">⇄ Mirror (L↔R)</button>
+                            <button id="btn-random-rule" class="btn btn-secondary btn-xs">🎲 Randomize</button>
+                            <button id="btn-reset-rule" class="btn btn-secondary btn-xs">Clear (00)</button>
+                        </div>
+                    </div>
+
+                    <div class="rule-table-container">
+                        <div class="table-header-title">
+                            <span>Interactive Rule Table (L + S + R = k)</span>
+                            <span class="subnote">Drag sliders or tweak numbers to define behavior</span>
+                        </div>
+                        <div id="rule-grid" class="rule-grid">
+                            <!-- Dynamically populated rows for k = 1..n -->
+                        </div>
+                    </div>
+
+                    <div class="custom-tape-card">
+                        <div class="accordion-header" id="tape-accordion-toggle">
+                            <span>⚙️ Custom Initial Tape (Optional)</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                        <div class="accordion-body hidden" id="tape-accordion-body">
+                            <p class="subnote">By default, all n pebbles start in a single cell at x=0. You can specify a custom distribution (e.g. <code>1 0 10 1</code> for the 12-pebble cryptid):</p>
+                            <div class="input-with-button">
+                                <input type="text" id="input-custom-tape" class="text-input code-font" placeholder="Standard: single cell of n at x=0">
+                                <button id="btn-apply-tape" class="btn btn-secondary btn-sm">Apply Tape</button>
+                            </div>
+                            <div style="margin-top:6px; display:flex; gap:6px;">
+                                <button id="btn-preset-4x9-tape" class="btn btn-xs btn-secondary">⚡ Load 4×9 Spaced Tape (9 at 0, 45, 90, 135)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: EXTREMELY FAST Finder -->
+                <div id="tab-finder" class="tab-pane">
+                    <div class="finder-header-card">
+                        <div class="finder-title">
+                            <span class="flash-icon">⚡</span>
+                            <div>
+                                <h3>Supercharged Pebble Automaton Finder</h3>
+                                <p class="subnote">Explore Busy Beaver champions, holdouts, and cryptids with multi-threaded C engine performance.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="finder-config-grid">
+                        <div class="config-item">
+                            <label><strong>Target n:</strong></label>
+                            <input type="number" id="finder-n" min="1" max="128" value="6" class="num-input">
+                        </div>
+
+                        <div class="config-item">
+                            <label><strong>CPU Threads:</strong></label>
+                            <input type="number" id="finder-threads" min="1" max="64" value="16" class="num-input" title="Parallel CPU threads for native engine">
+                        </div>
+
+                        <div class="config-item full-width">
+                            <label><strong>Search Strategy:</strong></label>
+                            <select id="finder-mode" class="select-input">
+                                <option value="tree">⚡ Ultra-Fast Tree Search (Exact BB Proof for n ≤ 8)</option>
+                                <option value="heuristic">🔥 Deep Heuristic & Genetic Search (For Large n ≥ 9)</option>
+                            </select>
+                        </div>
+
+                        <div class="config-item">
+                            <label><strong>Max Steps Limit:</strong></label>
+                            <input type="number" id="finder-max-steps" min="10" max="10000000" value="300" class="num-input">
+                        </div>
+
+                        <div class="config-item full-width">
+                            <label><strong>Search Duration (Decide Time):</strong></label>
+                            <div class="duration-controls-row">
+                                <div class="duration-input-wrapper">
+                                    <input type="number" id="finder-duration" min="0" step="1" value="5" class="num-input duration-input" title="Search time in seconds (0 = Unlimited / Run until complete proof)">
+                                    <span class="unit-tag">sec</span>
+                                </div>
+                                <div class="quick-duration-pills">
+                                    <button type="button" class="dur-pill" data-dur="2">2s</button>
+                                    <button type="button" class="dur-pill active" data-dur="5">5s</button>
+                                    <button type="button" class="dur-pill" data-dur="10">10s</button>
+                                    <button type="button" class="dur-pill" data-dur="30">30s</button>
+                                    <button type="button" class="dur-pill" data-dur="60">1m</button>
+                                    <button type="button" class="dur-pill" data-dur="300">5m</button>
+                                    <button type="button" class="dur-pill" data-dur="0" title="Unlimited (run until complete proof)">∞</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="finder-action-row">
+                        <button id="btn-start-finder" class="btn btn-accent btn-large">🚀 START EXTREME SEARCH</button>
+                        <button id="btn-stop-finder" class="btn btn-danger btn-large hidden">⏹ STOP SEARCH</button>
+                    </div>
+
+                    <!-- Live Real-Time Finder HUD -->
+                    <div id="finder-hud" class="finder-hud">
+                        <div class="hud-stat-box">
+                            <span class="hud-val" id="hud-rate">0.0</span>
+                            <span class="hud-label">Million Automata / sec</span>
+                        </div>
+                        <div class="hud-stat-box">
+                            <span class="hud-val" id="hud-evaluated">0</span>
+                            <span class="hud-label">Total Evaluated</span>
+                        </div>
+                        <div class="hud-stat-box">
+                            <span class="hud-val" id="hud-time">0.00s</span>
+                            <span class="hud-label">Elapsed Time</span>
+                        </div>
+                        <div class="hud-stat-box highlight">
+                            <span class="hud-val" id="hud-champion">0</span>
+                            <span class="hud-label">Top Steps Found</span>
+                        </div>
+                        <div class="hud-stat-box holdouts-stat-box">
+                            <span class="hud-val" id="hud-holdouts">0</span>
+                            <span class="hud-label">Holdouts (Undecided)</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div id="finder-progress-bar" class="progress-bar"></div>
+                    </div>
+
+                    <!-- Live Leaderboard of Discoveries -->
+                    <div class="leaderboard-section">
+                        <div class="leaderboard-header">
+                            <h4>🏆 Top Discoveries Leaderboard</h4>
+                            <span id="leaderboard-count" class="subnote">0 champions found</span>
+                        </div>
+                        <div class="table-scroll-wrap">
+                            <table class="leaderboard-table" id="leaderboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Steps</th>
+                                        <th>Rule Code</th>
+                                        <th>Time</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaderboard-body">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">No search run yet. Click "Start Extreme Search" to discover champions!</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Holdouts Section (Unresolved / Undecided Machines) -->
+                    <div class="holdouts-card" id="holdouts-card">
+                        <div class="holdouts-header">
+                            <div class="holdouts-title-group">
+                                <h4>🔬 Holdouts Explorer (Undecided Machines)</h4>
+                                <span id="holdouts-count-badge" class="badge-count">0 holdouts</span>
+                            </div>
+                            <div class="holdouts-actions">
+                                <button id="btn-download-holdouts" class="btn btn-secondary btn-sm" disabled title="Download all holdout rules as a text file">
+                                    📥 Download Holdouts (.txt)
+                                </button>
+                                <button id="btn-toggle-holdouts-table" class="btn btn-secondary btn-sm" title="Toggle sample view">👁 View Samples</button>
+                            </div>
+                        </div>
+                        <p class="subnote">
+                            Holdouts are machines that reached the max step limit without stabilizing or being caught by the cycle/glider deciders. They represent the Busy Beaver proof frontier!
+                        </p>
+                        <div class="holdouts-preview-wrap" id="holdouts-preview-wrap">
+                            <div class="table-scroll-wrap" style="max-height: 220px;">
+                                <table class="leaderboard-table" id="holdouts-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Holdout Rule</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="holdouts-body">
+                                        <tr>
+                                            <td colspan="3" class="empty-state">Run a search to discover holdouts.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Wiki & Cryptids -->
+                <div id="tab-wiki" class="tab-pane">
+                    <div class="wiki-content">
+                        <h3>What is a Pebble Automaton?</h3>
+                        <p>A <strong>Pebble Automaton</strong> is a 1-dimensional cellular automaton where each cell contains a non-negative integer number of pebbles.</p>
+                        <p>At each step, when a cell has $n$ pebbles, it pushes $L(n)$ pebbles to its left neighbor, $R(n)$ pebbles to its right neighbor, and keeps $S(n) = n - L(n) - R(n)$ in place.</p>
+
+                        <h4>Busy Beaver Function: peBBle(n)</h4>
+                        <p><code>peBBle(n)</code> is the maximum number of steps any $n$-pebble automaton takes to stabilize into a static state starting from a single cell containing $n$ pebbles.</p>
+
+                        <div class="wiki-table-wrap">
+                            <table class="wiki-table">
+                                <thead>
+                                    <tr>
+                                        <th>Domain</th>
+                                        <th>Runtime</th>
+                                        <th>Champion Rule</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>peBBle(1)</td><td>1 step</td><td><code>00</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="1" data-rule="00">Load</button></td></tr>
+                                    <tr><td>peBBle(2)</td><td>2 steps</td><td><code>00_01</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="2" data-rule="00_01">Load</button></td></tr>
+                                    <tr><td>peBBle(3)</td><td>4 steps</td><td><code>00_01_01</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="3" data-rule="00_01_01">Load</button></td></tr>
+                                    <tr><td>peBBle(4)</td><td>7 steps</td><td><code>00_01_20_03</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="4" data-rule="00_01_20_03">Load</button></td></tr>
+                                    <tr><td>peBBle(5)</td><td>11 steps</td><td><code>00_11_03_21_04</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="5" data-rule="00_11_03_21_04">Load</button></td></tr>
+                                    <tr><td>peBBle(6)</td><td>17 steps</td><td><code>00_11_03_21_40_15</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="6" data-rule="00_11_03_21_40_15">Load</button></td></tr>
+                                    <tr><td>peBBle(7)</td><td>28 steps</td><td><code>00_11_03_21_10_33_61</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="7" data-rule="00_11_03_21_10_33_61">Load</button></td></tr>
+                                    <tr><td>peBBle(8)</td><td>63 steps</td><td><code>00_11_03_21_50_30_24_70</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="8" data-rule="00_11_03_21_50_30_24_70">Load</button></td></tr>
+                                    <tr><td>peBBle(9)</td><td>63,577 steps</td><td><code>00_02_01_40_14_12_00_52_81</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="9" data-rule="00_02_01_40_14_12_00_52_81">Load</button></td></tr>
+                                    <tr><td>peBBle(10)</td><td>5,778 steps (optimal)</td><td><code>00_02_01_40_14_12_00_17_63_18</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="10" data-rule="00_02_01_40_14_12_00_17_63_18">Load</button></td></tr>
+                                    <tr><td>peBBle(11)</td><td>&ge; 810,626,821 steps</td><td><code>00_00_30_40_12_51_07_20_41_12_19</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="11" data-rule="00_00_30_40_12_51_07_20_41_12_19">Load</button></td></tr>
+                                    <tr><td>peBBle(12)</td><td>&ge; 311,680 steps</td><td><code>00_00_30_40_12_51_07_20_41_24_63_1b</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="12" data-rule="00_00_30_40_12_51_07_20_41_24_63_1b">Load</button></td></tr>
+                                    <tr><td>peBBle(13)</td><td>&ge; 1,774,252 steps</td><td><code>00_00_30_40_12_51_07_20_41_10_1b_01_52</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="13" data-rule="00_00_30_40_12_51_07_20_41_10_1b_01_52">Load</button></td></tr>
+                                    <tr><td>peBBle(14)</td><td>&ge; 218,353 steps</td><td><code>00_00_30_40_12_51_07_20_41_10_1b_01_b1_04</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="14" data-rule="00_00_30_40_12_51_07_20_41_10_1b_01_b1_04">Load</button></td></tr>
+                                    <tr><td>peBBle(15)</td><td>&ge; 117,917 steps</td><td><code>00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="15" data-rule="00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76">Load</button></td></tr>
+                                    <tr><td>peBBle(16)</td><td>&ge; 119,079 steps</td><td><code>00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76_02</code></td><td><button class="btn btn-xs btn-primary btn-load-wiki" data-n="16" data-rule="00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76_02">Load</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>Famous Cryptids & Holdouts</h4>
+                        <div class="cryptid-box">
+                            <h5>11-Pebble Exponential Bouncer Cryptid (Holdout #1)</h5>
+                            <p>Proved non-halting 3-body period-doubler ($T \sim 2^k$). An elastic rebound system between a mass-4 leftward glider (speed -1/3) and an expanding right wall.</p>
+                            <button class="btn btn-sm btn-secondary btn-load-wiki" data-n="11" data-rule="00_00_30_13_11_06_12_17_08_00_18">Load 11-Pebble Cryptid</button>
+                        </div>
+                        <div class="cryptid-box">
+                            <h5>12-Pebble Piecewise Affine Cryptid</h5>
+                            <p>Computes $A(u, v) \to A(4u-1, v-u)$ simulating the BMO1 cryptid from Turing machine theory.</p>
+                            <button class="btn btn-sm btn-secondary btn-load-wiki" data-n="12" data-rule="00_00_00_40_10_00_00_08_41_11_00_a1">Load 12-Pebble Cryptid</button>
+                        </div>
+                        <div class="cryptid-box">
+                            <h5>86-Pebble Hydra Cryptid</h5>
+                            <p>Engineered 86-pebble machine displaying fast Hydra-like non-halting growth.</p>
+                            <button class="btn btn-sm btn-secondary btn-load-wiki" data-n="86" data-rule="2:0,2 3:0,3 5:0,5 7:0,6 8:0,6 9:9,0 12:12,0 15:6,0 17:17,0 25:0,23 26:0,25 27:24,0 28:26,0 29:27,0 30:27,0 35:0,33 38:0,35 39:0,39 40:0,40 41:1,0 45:0,6 78:0,78 84:24,45 86:1,84">Load 86-Pebble Hydra</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Pebble Holdout Browser & Searcher -->
+                <div id="tab-holdouts" class="tab-pane">
+                    <div class="holdouts-container">
+                        <div class="holdouts-header">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h4>🔬 Pebble Holdout Browser & Searcher</h4>
+                                <select id="holdout-domain-select" class="select-input" style="font-size:0.75rem; padding:3px 8px; width:auto;">
+                                    <option value="11_elite" selected>🔥 Pebble(11) Final 22 Holdouts (bbchallenge)</option>
+                                    <option value="11">Pebble(11) (All 960 Holdouts)</option>
+                                    <option value="12">Pebble(12) (238 Verified Holdouts & Searcher)</option>
+                                </select>
+                            </div>
+                            <p id="holdouts-subnote" class="subnote">Browse Pebble(12) holdouts running for <strong>&ge; 1,000,000 steps</strong> with bouncers strictly preserved!</p>
+                            <div class="holdouts-filter-bar">
+                                <input type="text" id="holdouts-search" class="text-input" placeholder="🔍 Filter rule or #... (e.g. 00_02_20 or #1)">
+                                <span id="holdouts-count" class="badge">Loading...</span>
+                            </div>
+                            <div class="holdouts-quick-actions">
+                                <button id="btn-hunt-pebble12" class="btn btn-xs btn-primary" title="Run native C engine to find 20 more Pebble(12) holdouts">⚡ Hunt +20 Pebble(12)</button>
+                                <button id="btn-load-holdout-1" class="btn btn-xs btn-secondary" title="Load Holdout #1">⭐ Holdout #1</button>
+                                <button id="btn-random-holdout" class="btn btn-xs btn-secondary" title="Load Random Holdout">🎲 Random</button>
+                                <button id="btn-prev-holdout" class="btn btn-xs btn-secondary">◀ Prev</button>
+                                <button id="btn-next-holdout" class="btn btn-xs btn-secondary">Next ▶</button>
+                            </div>
+                        </div>
+                        <div id="holdouts-list" class="holdouts-list">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal for Wiki Details -->
+    <div id="info-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📖 Pebble Automaton Quick Guide</h3>
+                <button id="btn-close-modal" class="btn btn-icon">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Welcome to the <strong>Pebble Automaton Lab</strong>! Here is how to have the most fun exploring:</p>
+                <ul>
+                    <li><strong>Set n to whatever you want:</strong> Use the stepper or type any $n \ge 1$ in the Rule Editor or Finder.</li>
+                    <li><strong>Space-Time Diagram:</strong> Zoom with mouse wheel or <code>+</code>/<code>-</code> buttons. Click and drag to pan across the infinite tape.</li>
+                    <li><strong>Cell Inspection:</strong> Hover your mouse over any cell in the diagram to inspect coordinates, value, and where its pebbles are going!</li>
+                    <li><strong>Ultra-Fast Finder:</strong> Runs at <strong>millions of automata per second</strong> using the multi-core C engine. Click "Load into Diagrammer" on any champion found to watch it simulate instantly.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

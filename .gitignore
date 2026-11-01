@@ -1,0 +1,62 @@
+# Binaries and compiled objects
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+
+# Images and media dumps
+*.ppm
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Logs and system tasks
+*.log
+.system_generated/
+scratch/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Temporary and exploratory search scripts
+bench_*
+check_*
+eval_*
+fast_*
+filter_*
+find_*
+generate_*
+enumerate_*
+mega_*
+scan_*
+sim_champs*
+time_*
+trace_*
+z_*
+test_*
+patch_*
+update_*
+analyze_*
+sync_*
+categorize_*
+convert_*
+inspect_*
+macro_search_*
+search_*
+holdout_hunter*
+pebble12_champion*
+pebble12_holdout_finder*
+verify_*
+apply_*
+task-*
+
+# Intermediate text files (curated datasets are preserved in JSON)
+*.txt
+
+# OS metadata
+.DS_Store
+Thumbs.db
