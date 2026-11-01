@@ -38,7 +38,7 @@
                     <select id="preset-select" class="select-input">
                         <option value="">-- Choose Preset Machine --</option>
                     </select>
-                    <button id="btn-load-4x9" class="btn btn-primary btn-sm" style="font-weight:700; background:linear-gradient(135deg, #ff0077, #7928ca); border:none; padding:4px 10px;" title="Load 00_02_01_40_14_12_00_52_81 with four 9-pebble wave packets spaced 45 cells apart">🚀 4×9 Super-Automaton</button>
+                    <button id="btn-load-4x9" class="btn btn-featured btn-sm" title="Load 00_02_01_40_14_12_00_52_81 with four 9-pebble wave packets spaced 45 cells apart">🚀 4×9 Super-Machine</button>
                 </div>
 
                 <div class="toolbar-group">
@@ -65,15 +65,17 @@
                     <button id="btn-zoom-out" class="btn btn-icon" title="Zoom Out">&minus;</button>
                     <button id="btn-fit" class="btn btn-icon" title="Reset View & Fit (Auto-Fit 1M Steps)">⛶ Fit</button>
                     <button id="btn-aspect" class="btn btn-toggle active" title="Toggle Square (1:1) vs Auto-Fit Anamorphic (Stretches view to fit million-step tape)">Auto-Fit Aspect</button>
-                    <div class="aspect-width-control" style="display:inline-flex; align-items:center; gap:5px; margin-left:3px; background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:4px; font-size:0.75rem; border:1px solid rgba(255,255,255,0.12);" title="Set the horizontal width of the auto-fit diagram (e.g. 20% for a slim/thin diagram, 100% for full width)">
-                        <label style="cursor:pointer; font-weight:600; color:var(--text-secondary); user-select:none;">X-Width:</label>
-                        <input type="range" id="aspect-width-slider" min="5" max="100" value="100" step="5" style="width:65px; height:6px; accent-color:var(--accent-cyan); cursor:pointer;" title="Adjust X aspect ratio width (5% to 100%)">
-                        <span id="aspect-width-label" style="font-family:var(--font-code); font-weight:700; min-width:34px; color:var(--accent-cyan);">100%</span>
+                    <div class="aspect-width-control" title="Adjust horizontal width (5% to 100%)">
+                        <label>Width:</label>
+                        <input type="range" id="aspect-width-slider" min="5" max="100" value="100" step="5">
+                        <span id="aspect-width-label">100%</span>
                     </div>
                     <button id="btn-follow" class="btn btn-toggle active" title="Auto-center on active tape">Center</button>
-                    <button id="btn-export-png" class="btn btn-icon" title="Export PNG Image">📷</button>
-                    <button id="btn-record-video" class="btn btn-icon" title="Record Animated Video Clip (WebM for Discord)">🎬</button>
-                    <button id="btn-export-ascii" class="btn btn-icon" title="Copy Wiki ASCII Art">📋</button>
+                    <div class="toolbar-divider"></div>
+                    <button id="btn-export-png" class="btn btn-action-tool" title="Export High-Res PNG Image">📷 PNG</button>
+                    <button id="btn-export-gif" class="btn btn-action-tool" title="Record & Export Animated GIF">🎞️ GIF</button>
+                    <button id="btn-record-video" class="btn btn-action-tool" title="Record Animated Video Clip (WebM for Discord)">🎬 Clip</button>
+                    <button id="btn-export-ascii" class="btn btn-action-tool" title="Copy Wiki ASCII Art">📋 ASCII</button>
                 </div>
             </div>
 
@@ -94,9 +96,9 @@
                         <input type="number" id="sim-max-steps" value="10000" min="100" max="10000000" step="5000" class="num-input sim-steps-input" title="Max Step Limit for Run to End (e.g. 100,000 for peBBle(9))">
                     </div>
 
-                    <div class="cosmic-leap-group" style="display:inline-flex; align-items:center; gap:4px; margin-left:6px; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:5px; border:1px solid rgba(255,255,255,0.12);">
-                        <span style="font-size:0.75rem; font-weight:700; color:var(--accent-cyan);">🚀 Cosmic Leap:</span>
-                        <button id="btn-leap-googol" class="btn btn-xs" style="background:rgba(0,240,255,0.15); border:1px solid var(--accent-cyan); color:var(--accent-cyan); font-weight:700;" title="Leap instantaneously to 10^100 steps (Googol)">10^100</button>
+                    <div class="cosmic-leap-group">
+                        <span class="cosmic-label">Cosmic Leap:</span>
+                        <button id="btn-leap-googol" class="btn btn-xs btn-leap" title="Instant leap to 10^100 steps (Googol)">10^100</button>
                     </div>
                 </div>
 
@@ -105,20 +107,16 @@
                     <input type="range" id="step-scrubber" min="0" max="0" value="0" class="slider">
                 </div>
 
-                <div class="speed-group" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <div class="speed-group" class="speed-group">
                     <label>Speed:</label>
                     <input type="range" id="speed-slider" min="0" max="19" value="3" class="slider" title="Simulation Speed (up to Cosmic Googol 10^100 steps/s)">
-                    <span id="speed-label" style="font-weight:700; min-width:95px; font-family:var(--font-code); font-size:0.75rem;">100 steps/s</span>
-                    <div class="speed-presets" style="display:flex; gap:3px; margin-left:2px; flex-wrap:wrap;">
+                    <span id="speed-label" >100 steps/s</span>
+                    <div class="speed-presets">
                         <button class="btn btn-xs btn-speed-preset" data-speed="100">100/s</button>
-                        <button class="btn btn-xs btn-speed-preset btn-turbo" data-speed="1000000" style="background:rgba(255,0,119,0.22); color:var(--accent-pink); border:1px solid var(--accent-pink); font-weight:700;" title="1,000,000 steps/s Turbo">⚡ 1M/s</button>
-                        <button class="btn btn-xs btn-speed-preset btn-ultra" data-speed="500000000" style="background:rgba(255,187,0,0.22); color:#ffd700; border:1px solid #ffd700; font-weight:800;" title="500,000,000 steps/s Hyper Speed">🚀 500M/s</button>
-                        <button class="btn btn-xs btn-speed-preset btn-warp" data-speed="1e12" style="background:rgba(0,229,255,0.2); color:var(--accent-cyan); border:1px solid var(--accent-cyan); font-weight:800;" title="1 Trillion (10^12) steps/s">🌌 1T/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e15" style="background:rgba(168,85,247,0.28); color:#e9d5ff; border:1px solid #c084fc; font-weight:800;" title="1 Quadrillion (10^15) steps/s">🪐 1Qa/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e18" style="background:rgba(236,72,153,0.28); color:#fbcfe8; border:1px solid #f472b6; font-weight:800;" title="1 Quintillion (10^18) steps/s">☀️ 1Qi/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e21" style="background:rgba(59,130,246,0.28); color:#bfdbfe; border:1px solid #60a5fa; font-weight:800;" title="1 Sextillion (10^21) steps/s">🕳️ 1Sx/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e30" style="background:linear-gradient(135deg, rgba(255,0,128,0.4), rgba(121,40,202,0.45), rgba(0,240,255,0.4)); color:#ffffff; border:1px solid #00f0ff; font-weight:900;" title="1 Nonillion (10^30) steps/s Omega Parabolic + Light-Cone Drive">♾️ 1No/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e100" style="background:rgba(236,72,153,0.3); color:#fbcfe8; border:1px solid #f472b6; font-weight:800;" title="1 Googol (10^100) steps/s">🌌 10^100/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1000000">1M/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="500000000">500M/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e12">1T/s</button>
+                        <button class="btn btn-xs btn-speed-preset" data-speed="1e100">10^100/s</button>
                     </div>
                 </div>
 

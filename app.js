@@ -11,6 +11,7 @@
 
 
 import { PebbleRule, PebbleSimulator, PRESETS, COLOR_PALETTES, HyperStep } from "./engine.js";
+import { encodeGIF } from "./gif-encoder.js";
 
 
 
@@ -244,6 +245,7 @@ const btnFit = document.getElementById("btn-fit");
 const btnFollow = document.getElementById("btn-follow");
 
 const btnExportPng = document.getElementById("btn-export-png");
+const btnExportGif = document.getElementById("btn-export-gif");
 const btnRecordVideo = document.getElementById("btn-record-video");
 
 const btnExportAscii = document.getElementById("btn-export-ascii");
@@ -1905,7 +1907,7 @@ btnExportAscii.addEventListener("click", () => {
 
     btnExportAscii.textContent = "✓ Copied ASCII!";
 
-    setTimeout(() => btnExportAscii.textContent = "📋", 1500);
+    setTimeout(() => btnExportAscii.textContent = "📋 ASCII", 1500);
 
 });
 
@@ -1913,6 +1915,97 @@ btnExportAscii.addEventListener("click", () => {
 
 // Export to PNG Image
 
+// Export to Animated GIF
+if (btnExportGif) {
+    let gifRecording = false;
+    let gifFrames = [];
+    let gifTimer = null;
+    let gifTargetWidth = 0;
+    let gifTargetHeight = 0;
+    const offCanvas = document.createElement("canvas");
+    const offCtx = offCanvas.getContext("2d", { willReadFrequently: true });
+
+    function captureGifFrame() {
+        if (!gifRecording) return;
+        try {
+            // Downsample to max width 480 for ultra-fast client-side compression and light file size
+            const maxW = 480;
+            const aspect = canvas.height / canvas.width;
+            gifTargetWidth = Math.min(canvas.width, maxW);
+            gifTargetHeight = Math.max(1, Math.round(gifTargetWidth * aspect));
+            if (offCanvas.width !== gifTargetWidth || offCanvas.height !== gifTargetHeight) {
+                offCanvas.width = gifTargetWidth;
+                offCanvas.height = gifTargetHeight;
+            }
+            offCtx.drawImage(canvas, 0, 0, gifTargetWidth, gifTargetHeight);
+            const imgData = offCtx.getImageData(0, 0, gifTargetWidth, gifTargetHeight);
+            gifFrames.push(new Uint8Array(imgData.data));
+            btnExportGif.innerHTML = `🔴 GIF (${gifFrames.length})`;
+
+            if (gifFrames.length >= 60) {
+                stopAndCompileGif();
+            }
+        } catch (e) {
+            console.error("Frame capture error:", e);
+        }
+    }
+
+    function stopAndCompileGif() {
+        if (!gifRecording) return;
+        gifRecording = false;
+        clearInterval(gifTimer);
+        gifTimer = null;
+
+        if (gifFrames.length === 0) {
+            btnExportGif.innerHTML = "🎞️ GIF";
+            btnExportGif.classList.remove("btn-gif-recording");
+            return;
+        }
+
+        btnExportGif.innerHTML = "⌛ Encoding...";
+        btnExportGif.title = "Encoding GIF, please wait...";
+
+        setTimeout(() => {
+            try {
+                // 10 centiseconds per frame = 10fps
+                const gifBytes = encodeGIF(gifTargetWidth, gifTargetHeight, gifFrames, 10);
+                const blob = new Blob([gifBytes], { type: "image/gif" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `pebble_${currentRule ? currentRule.n : 6}_simulation.gif`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            } catch (err) {
+                console.error("GIF encoding error:", err);
+                alert("GIF encoding failed: " + err.message);
+            } finally {
+                gifFrames = [];
+                btnExportGif.innerHTML = "🎞️ GIF";
+                btnExportGif.classList.remove("btn-gif-recording");
+                btnExportGif.title = "Record & Export Animated GIF";
+            }
+        }, 50);
+    }
+
+    btnExportGif.addEventListener("click", () => {
+        if (gifRecording) {
+            stopAndCompileGif();
+            return;
+        }
+
+        gifFrames = [];
+        gifRecording = true;
+        btnExportGif.classList.add("btn-gif-recording");
+        btnExportGif.innerHTML = "🔴 GIF (0)";
+        btnExportGif.title = "GIF Recording in progress... Click to stop & save";
+
+        captureGifFrame();
+        gifTimer = setInterval(captureGifFrame, 100);
+    });
+}
+
+// Export to Video Clip (WebM)
 if (btnRecordVideo) {
     let mediaRecorder = null;
     let recordedChunks = [];
@@ -1943,7 +2036,7 @@ if (btnRecordVideo) {
 
             mediaRecorder.onstop = () => {
                 clearInterval(recordTimer);
-                btnRecordVideo.innerHTML = "🎬";
+                btnRecordVideo.innerHTML = "🎬 Clip";
                 btnRecordVideo.classList.remove("btn-recording");
                 btnRecordVideo.title = "Record Animated Video Clip (WebM for Discord)";
 
