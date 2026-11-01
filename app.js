@@ -2833,8 +2833,6 @@ const holdoutsCount = document.getElementById("holdouts-count");
 
 const holdoutsList = document.getElementById("holdouts-list");
 
-const btnHuntPebble12 = document.getElementById("btn-hunt-pebble12");
-
 const btnLoadHoldout1 = document.getElementById("btn-load-holdout-1");
 
 const btnRandomHoldout = document.getElementById("btn-random-holdout");
@@ -2852,19 +2850,13 @@ async function loadHoldoutsData(domain = "11_elite") {
     if (holdoutsCount) holdoutsCount.textContent = "Loading...";
 
     let filename = "./holdouts_sz11_22.json";
-    if (domain === 12 || domain === "12") {
-        filename = "./holdouts_sz12.json";
-    } else if (domain === 11 || domain === "11") {
+    if (domain === 11 || domain === "11") {
         filename = "./holdouts_sz11.json";
     }
 
     if (holdoutsSubnote) {
 
-        if (domain === 12 || domain === "12") {
-
-            holdoutsSubnote.innerHTML = `Browse Pebble(12) holdouts running for <strong>&ge; 1,000,000 steps</strong> with bouncers strictly preserved!`;
-
-        } else if (domain === "11_elite") {
+        if (domain === "11_elite") {
 
             holdoutsSubnote.innerHTML = `Browse the <strong>final 22 holdouts</strong> for $n=11$ (narrowed down from 960 by bbchallenge in 24 hours!).`;
 
@@ -3125,7 +3117,7 @@ function setupHoldoutEvents() {
         holdoutDomainSelect.addEventListener("change", (e) => {
 
             const val = e.target.value;
-            loadHoldoutsData(val === "12" ? 12 : (val === "11" ? 11 : "11_elite"));
+            loadHoldoutsData(val === "11" ? 11 : "11_elite");
 
         });
 
@@ -3133,43 +3125,7 @@ function setupHoldoutEvents() {
 
 
 
-    if (btnHuntPebble12) {
 
-        btnHuntPebble12.addEventListener("click", async () => {
-
-            btnHuntPebble12.disabled = true;
-
-            const origText = btnHuntPebble12.textContent;
-
-            btnHuntPebble12.textContent = "⚡ Hunting...";
-
-            try {
-
-                const resp = await fetch("/api/search_holdouts12?count=20");
-
-                if (resp.ok) {
-
-                    await loadHoldoutsData(12);
-
-                    if (holdoutDomainSelect) holdoutDomainSelect.value = "12";
-
-                }
-
-            } catch (err) {
-
-                console.error("Hunt error:", err);
-
-            } finally {
-
-                btnHuntPebble12.disabled = false;
-
-                btnHuntPebble12.textContent = origText;
-
-            }
-
-        });
-
-    }
 
 
 

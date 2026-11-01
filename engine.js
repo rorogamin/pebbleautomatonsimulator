@@ -2578,13 +2578,6 @@ export const PRESETS = [
         desc: "Current 11-pebble lower bound. Executes 810M+ steps of intricate space-time computation."
     },
     {
-        name: "11-Pebble Cryptid (Exponential Bouncer)",
-        n: 11,
-        code: "00_00_30_13_11_06_12_17_08_00_18",
-        steps: "Infinite (Doubler)",
-        desc: "Proved non-halting 3-body period doubler. Rebounds between a mass-4 glider and right wall with T ~ 2^k."
-    },
-    {
         name: "12-Pebble Cryptid (Piecewise Affine / BMO1)",
         n: 12,
         code: "00_00_00_40_10_00_00_08_41_11_00_a1",
@@ -2611,41 +2604,62 @@ export const PRESETS = [
         code: "00_00_30_40_12_51_07_20_41_24_63_1b",
         steps: 311680,
         desc: "Constructs a multi-wall parabolic resonator across 535 cells before a critical phase collision collapses all walls into static 2s and 1s at step 311,680."
-    },
-    {
-        name: "peBBle(13) ≥ 1,774,252 Steps (Record Champion)",
-        n: 13,
-        code: "00_00_30_40_12_51_07_20_41_10_1b_01_52",
-        steps: 1774252,
-        desc: "New record holder: massive 13-pebble parabolic bouncer spanning over 1,200 cells that resonates through 1.77 million steps before freezing cleanly into inert static debris."
-    },
-    {
-        name: "peBBle(14) ≥ 218,353 Steps (Record Champion)",
-        n: 14,
-        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04",
-        steps: 218353,
-        desc: "Discovered 14-pebble champion: intricate dual-cavity resonator halting at 218,353 steps."
-    },
-    {
-        name: "peBBle(15) ≥ 117,917 Steps (Record Champion)",
-        n: 15,
-        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76",
-        steps: 117917,
-        desc: "Discovered 15-pebble champion: multi-barrier harmonic shuttle halting cleanly at 117,917 steps."
-    },
-    {
-        name: "peBBle(16) ≥ 119,079 Steps (Record Champion)",
-        n: 16,
-        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76_02",
-        steps: 119079,
-        desc: "Discovered 16-pebble champion: extended 16-state resonator halting at 119,079 steps."
     },
+
     {
-        name: "12-Pebble Exponential Twin-Wall Warp Cryptid",
-        n: 12,
-        code: "00_00_30_13_11_06_12_17_08_00_18_b1",
-        steps: "Exponential (Trillions/s)",
-        desc: "Spawns two expanding static inner 1-walls alongside a mass-6 shuttle and outer glider; reaches Trillions of steps/s in Warp mode."
+
+        name: "peBBle(13) ≥ 1,774,252 Steps (Record Champion)",
+
+        n: 13,
+
+        code: "00_00_30_40_12_51_07_20_41_10_1b_01_52",
+
+        steps: 1774252,
+
+        desc: "New record holder: massive 13-pebble parabolic bouncer spanning over 1,200 cells that resonates through 1.77 million steps before freezing cleanly into inert static debris."
+
+    },
+
+    {
+
+        name: "peBBle(14) ≥ 218,353 Steps (Record Champion)",
+
+        n: 14,
+
+        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04",
+
+        steps: 218353,
+
+        desc: "Discovered 14-pebble champion: intricate dual-cavity resonator halting at 218,353 steps."
+
+    },
+
+    {
+
+        name: "peBBle(15) ≥ 117,917 Steps (Record Champion)",
+
+        n: 15,
+
+        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76",
+
+        steps: 117917,
+
+        desc: "Discovered 15-pebble champion: multi-barrier harmonic shuttle halting cleanly at 117,917 steps."
+
+    },
+
+    {
+
+        name: "peBBle(16) ≥ 119,079 Steps (Record Champion)",
+
+        n: 16,
+
+        code: "00_00_30_40_12_51_07_20_41_10_1b_01_b1_04_76_02",
+
+        steps: 119079,
+
+        desc: "Discovered 16-pebble champion: extended 16-state resonator halting at 119,079 steps."
+
     },
     {
         name: "13-Pebble 5-Dome Parabolic Cathedral",
