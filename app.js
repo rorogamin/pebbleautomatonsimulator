@@ -244,6 +244,7 @@ const btnFit = document.getElementById("btn-fit");
 const btnFollow = document.getElementById("btn-follow");
 
 const btnExportPng = document.getElementById("btn-export-png");
+const btnRecordVideo = document.getElementById("btn-record-video");
 
 const btnExportAscii = document.getElementById("btn-export-ascii");
 
@@ -1911,6 +1912,71 @@ btnExportAscii.addEventListener("click", () => {
 
 
 // Export to PNG Image
+
+if (btnRecordVideo) {
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recordTimer = null;
+    let recordSeconds = 0;
+
+    btnRecordVideo.addEventListener("click", () => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            return;
+        }
+
+        try {
+            const stream = canvas.captureStream(30);
+            let options = { mimeType: "video/webm;codecs=vp9" };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = { mimeType: "video/webm" };
+            }
+
+            mediaRecorder = new MediaRecorder(stream, options);
+            recordedChunks = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                clearInterval(recordTimer);
+                btnRecordVideo.innerHTML = "🎬";
+                btnRecordVideo.classList.remove("btn-recording");
+                btnRecordVideo.title = "Record Animated Video Clip (WebM for Discord)";
+
+                if (recordedChunks.length === 0) return;
+                const blob = new Blob(recordedChunks, { type: "video/webm" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `pebble_${currentRule ? currentRule.n : 6}_simulation.webm`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            };
+
+            mediaRecorder.start();
+            recordSeconds = 0;
+            btnRecordVideo.classList.add("btn-recording");
+            btnRecordVideo.innerHTML = `🔴 0s`;
+            btnRecordVideo.title = "Recording in progress... Click to stop";
+
+            recordTimer = setInterval(() => {
+                recordSeconds++;
+                btnRecordVideo.innerHTML = `🔴 ${recordSeconds}s`;
+                if (recordSeconds >= 60) {
+                    mediaRecorder.stop();
+                }
+            }, 1000);
+
+        } catch (err) {
+            console.error("Recording error:", err);
+            alert("Video recording error: " + err.message);
+        }
+    });
+}
 
 btnExportPng.addEventListener("click", () => {
 

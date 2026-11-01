@@ -1308,3 +1308,13 @@ canvas#spacetime-canvas {
     color: #fff !important;
     box-shadow: 0 0 8px rgba(255, 0, 119, 0.5);
 }
+
+.btn-recording {
+    background: #e74c3c !important;
+    color: white !important;
+    animation: recPulse 1s infinite alternate !important;
+}
+@keyframes recPulse {
+    0% { transform: scale(1); box-shadow: 0 0 4px #e74c3c; }
+    100% { transform: scale(1.08); box-shadow: 0 0 12px #e74c3c; }
+}
