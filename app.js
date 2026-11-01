@@ -2103,35 +2103,63 @@ tapeToggle.addEventListener("click", () => {
 
 
 
-btnApplyTape.addEventListener("click", () => {
+export function parseCustomTapeInput(raw, defaultN = 6) {
+    if (!raw || !raw.trim()) return null;
+    raw = raw.trim();
 
-    const raw = inputCustomTape.value.trim();
-
-    if (!raw) {
-
-        customTape = null;
-
-        resetSimulation();
-
-        return;
-
+    // 1. Try to match coordinate pairs like x:v, x=v, or (x, v), [x, v]
+    const pairRegex = /(?:\[|\()?\s*(-?\d+)\s*(?::|=|,)\s*(\d+)\s*(?:\]|\))?/g;
+    const matches = Array.from(raw.matchAll(pairRegex));
+    
+    // If there are colon/equal matches, or bracketed tuples
+    if (matches.length > 0 && (raw.includes(':') || raw.includes('=') || raw.includes('[') || raw.includes('('))) {
+        const tape = [];
+        for (const m of matches) {
+            const x = parseInt(m[1], 10);
+            const v = parseInt(m[2], 10);
+            if (!isNaN(x) && !isNaN(v) && v > 0) {
+                tape.push([x, v]);
+            }
+        }
+        if (tape.length > 0) {
+            tape.sort((a, b) => a[0] - b[0]);
+            return tape;
+        }
     }
 
-    const vals = raw.split(/[\s,]+/).map(v => parseInt(v, 16) || parseInt(v) || 0);
+    // 2. Otherwise treat as a sequence of decimal numbers (e.g. '1 0 10 1' or '11')
+    const tokens = raw.split(/[\s,]+/).filter(t => t.length > 0);
+    const nums = tokens.map(t => parseInt(t, 10)).filter(n => !isNaN(n));
+    if (nums.length === 0) return null;
 
-    const midIdx = Math.floor(vals.length / 2);
+    if (nums.length === 1) {
+        return [[0, nums[0]]];
+    }
 
-    customTape = [];
-
-    vals.forEach((v, idx) => {
-
-        if (v > 0) customTape.push([idx - midIdx, v]);
-
+    // For a sequence, center around x=0
+    const midIdx = Math.floor(nums.length / 2);
+    const tape = [];
+    nums.forEach((v, idx) => {
+        if (v > 0) tape.push([idx - midIdx, v]);
     });
+    return tape.length > 0 ? tape : null;
+}
 
+btnApplyTape.addEventListener("click", () => {
+    const raw = inputCustomTape.value.trim();
+    customTape = parseCustomTapeInput(raw, currentRule ? currentRule.n : 6);
     resetSimulation();
     renderTapeRibbon();
+    fitToScreen();
 });
+
+if (inputCustomTape) {
+    inputCustomTape.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            btnApplyTape.click();
+        }
+    });
+}
 
 
 
