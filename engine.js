@@ -2704,6 +2704,20 @@ export const PRESETS = [
         code: "00_20_12",
         steps: "Period 3",
         desc: "Period of 3 steps with an offset of 1 cell."
+    },
+    {
+        name: "✨ 16-Pebble Sierpinski Diamond Tapestry (Visual Chaos)",
+        n: 16,
+        code: "0,0_1,1_1,1_2,2_2,2_3,3_3,3_4,4_4,4_5,5_5,5_6,6_6,6_7,7_7,7_7,7",
+        steps: "Fractal Tapestry",
+        desc: "Pure visual spectacle: symmetrical chain-reaction splitting creates an expansive, multi-colored Sierpinski diamond lattice filled with vibrant interfering wave fronts."
+    },
+    {
+        name: "🔥 14-Pebble Turbulent Soliton Firestorm (Visual Chaos)",
+        n: 14,
+        code: "00_20_01_13_11_05_60_06_23_73_91_02_00_29",
+        steps: "Chaotic Soup",
+        desc: "Highly turbulent visual fireworks: active multi-particle collisions create a crackling, jagged, flame-like texture across the space-time canvas."
     }
 ];
 
