@@ -73,7 +73,7 @@ To rigorously verify non-halting holdout behaviors without heuristic speculation
 - **Accelerated Simulator**:
   - An accelerated macro-transition operator advances the glider across empty cavity space and computes boundary reflections in $O(1)$ time.
 - **Non-Halting Invariant**:
-  - Stable cell values are $\{0, 1, 2, 9\}$. The active glider contains $6$ pebbles that never decay into inert singletons or pairs, ensuring $\exists x, \text{is\_stable}(p(x)) = \text{false}$ for all $t$. Thus, Holdout #7 **never stabilizes**.
+  - Stable cell values are $\{0, 1, 2, 9\}$. The active glider contains $6$ pebbles that never decay into inert singletons or pairs, ensuring $\exists x, \operatorname{is\_stable}(p(x)) = \text{false}$ for all $t$. Thus, Holdout #7 **never stabilizes**.
 
 ### Verifying the Proofs Locally
 
