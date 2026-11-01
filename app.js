@@ -1061,10 +1061,8 @@ function updateUI() {
 
         let allMinX = (simulator.historyMinX !== undefined) ? simulator.historyMinX : minX;
         let allMaxX = (simulator.historyMaxX !== undefined) ? simulator.historyMaxX : maxX;
-        if (allMinX === 0 && allMaxX === 0 && simulator.history.length > 0) {
-            allMinX = simulator.history[0].minX;
-            allMaxX = simulator.history[0].maxX;
-        }
+        if (minX < allMinX) allMinX = minX;
+        if (maxX > allMaxX) allMaxX = maxX;
 
         const maxAbsX = Math.max(Math.abs(allMinX), Math.abs(allMaxX));
         const curWidth = Math.max(10, 2 * maxAbsX + 4);

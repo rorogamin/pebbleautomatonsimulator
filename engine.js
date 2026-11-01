@@ -733,6 +733,8 @@ reset(customTape = null) {
         const len = compact.len;
         const minX = len > 0 ? compact.xs[0] : 0;
         const maxX = len > 0 ? compact.xs[len - 1] : 0;
+        if (this.historyMinX === undefined || minX < this.historyMinX) this.historyMinX = minX;
+        if (this.historyMaxX === undefined || maxX > this.historyMaxX) this.historyMaxX = maxX;
         this.history.push({
             step: this.step,
             tape: compact,
