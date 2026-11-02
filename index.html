@@ -86,45 +86,49 @@
 
             <!-- Playback & Stats Bar -->
             <div class="playback-bar">
-                <div class="playback-controls">
-                    <button id="btn-reset" class="btn btn-icon" title="Reset Simulation (R)">⏮</button>
-                    <button id="btn-prev" class="btn btn-icon" title="Step Back (Left Arrow)">◀</button>
-                    <button id="btn-play" class="btn btn-primary" title="Play / Pause (Space)">▶ Play</button>
-                    <button id="btn-next" class="btn btn-icon" title="Step Forward (Right Arrow)">▶</button>
-                    <div class="run-end-group">
-                        <button id="btn-run-all" class="btn btn-secondary" title="Simulate until Halt">⚡ Run to End</button>
-                        <input type="number" id="sim-max-steps" value="10000" min="100" max="10000000" step="5000" class="num-input sim-steps-input" title="Max Step Limit for Run to End (e.g. 100,000 for peBBle(9))">
+                <div class="playback-row playback-row-primary">
+                    <div class="playback-controls">
+                        <button id="btn-reset" class="btn btn-icon" title="Reset Simulation (R)">⏮</button>
+                        <button id="btn-prev" class="btn btn-icon" title="Step Back (Left Arrow)">◀</button>
+                        <button id="btn-play" class="btn btn-primary" title="Play / Pause (Space)">▶ Play</button>
+                        <button id="btn-next" class="btn btn-icon" title="Step Forward (Right Arrow)">▶</button>
+                        <div class="run-end-group">
+                            <button id="btn-run-all" class="btn btn-secondary" title="Simulate until Halt">⚡ Run to End</button>
+                            <input type="number" id="sim-max-steps" value="10000" min="100" max="10000000" step="5000" class="num-input sim-steps-input" title="Max Step Limit for Run to End (e.g. 100,000 for peBBle(9))">
+                        </div>
+
+                        <div class="cosmic-leap-group">
+                            <span class="cosmic-label">Cosmic Leap:</span>
+                            <button id="btn-leap-googol" class="btn btn-xs btn-leap" title="Instant leap to 10^100 steps (Googol)">10^100</button>
+                        </div>
                     </div>
 
-                    <div class="cosmic-leap-group">
-                        <span class="cosmic-label">Cosmic Leap:</span>
-                        <button id="btn-leap-googol" class="btn btn-xs btn-leap" title="Instant leap to 10^100 steps (Googol)">10^100</button>
-                    </div>
-                </div>
-
-                <div class="scrubber-group">
-                    <span id="step-label" class="step-label">Step: 0</span>
-                    <input type="range" id="step-scrubber" min="0" max="0" value="0" class="slider">
-                </div>
-
-                <div class="speed-group" class="speed-group">
-                    <label>Speed:</label>
-                    <input type="range" id="speed-slider" min="0" max="19" value="3" class="slider" title="Simulation Speed (up to Cosmic Googol 10^100 steps/s)">
-                    <span id="speed-label" >100 steps/s</span>
-                    <div class="speed-presets">
-                        <button class="btn btn-xs btn-speed-preset" data-speed="100">100/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1000000">1M/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="500000000">500M/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e12">1T/s</button>
-                        <button class="btn btn-xs btn-speed-preset" data-speed="1e100">10^100/s</button>
+                    <div class="scrubber-group">
+                        <span id="step-label" class="step-label">Step: 0</span>
+                        <input type="range" id="step-scrubber" min="0" max="0" value="0" class="slider">
                     </div>
                 </div>
 
-                <div class="toggle-group">
-                    <label class="toggle-control" title="When unchecked, the simulation continues running even after a decider identifies a cycler or bouncer.">
-                        <input type="checkbox" id="auto-stop-decider">
-                        <span>Auto-stop Decider</span>
-                    </label>
+                <div class="playback-row playback-row-secondary">
+                    <div class="speed-group">
+                        <label>Speed:</label>
+                        <input type="range" id="speed-slider" min="0" max="19" value="3" class="slider speed-slider-input" title="Simulation Speed (up to Cosmic Googol 10^100 steps/s)">
+                        <span id="speed-label">100 steps/s</span>
+                        <div class="speed-presets">
+                            <button class="btn btn-xs btn-speed-preset" data-speed="100">100/s</button>
+                            <button class="btn btn-xs btn-speed-preset" data-speed="1000000">1M/s</button>
+                            <button class="btn btn-xs btn-speed-preset" data-speed="500000000">500M/s</button>
+                            <button class="btn btn-xs btn-speed-preset" data-speed="1e12">1T/s</button>
+                            <button class="btn btn-xs btn-speed-preset" data-speed="1e100">10^100/s</button>
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-control" title="When unchecked, the simulation continues running even after a decider identifies a cycler or bouncer.">
+                            <input type="checkbox" id="auto-stop-decider">
+                            <span>Auto-stop Decider</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 

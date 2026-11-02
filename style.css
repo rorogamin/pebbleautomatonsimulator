@@ -235,19 +235,34 @@ canvas#spacetime-canvas {
 
 /* Playback Bar */
 .playback-bar {
-    padding: 8px 16px;
+    padding: 6px 16px;
     background: var(--bg-card);
     border-top: 1px solid var(--border-color);
     display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.playback-row {
+    display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    width: 100%;
+}
+
+.playback-row-primary {
+    justify-content: flex-start;
+}
+
+.playback-row-secondary {
+    justify-content: flex-start;
 }
 
 .playback-controls {
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .scrubber-group {
@@ -255,6 +270,7 @@ canvas#spacetime-canvas {
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 140px;
 }
 
 .step-label {
@@ -263,6 +279,7 @@ canvas#spacetime-canvas {
     font-weight: 600;
     color: var(--accent-cyan);
     min-width: 90px;
+    flex-shrink: 0;
 }
 
 .speed-group {
@@ -271,16 +288,45 @@ canvas#spacetime-canvas {
     gap: 8px;
     font-size: 0.75rem;
     color: var(--text-secondary);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
-.speed-group span {
-    min-width: 80px;
+.speed-group label {
+    flex-shrink: 0;
+}
+
+.speed-slider-input {
+    width: 120px !important;
+    max-width: 120px !important;
+    flex: 0 0 120px !important;
+}
+
+.speed-group span, #speed-label {
+    width: 135px;
+    min-width: 135px;
+    max-width: 135px;
     font-family: var(--font-code);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.speed-presets {
+    display: flex;
+    gap: 4px;
+    margin-left: 4px;
+    flex-shrink: 0;
 }
 
 .toggle-group {
     display: flex;
     align-items: center;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 .toggle-control {
